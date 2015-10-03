@@ -56,7 +56,7 @@ public class KMeans extends ClusteringAlgorithm
 		float total=0;
 		for(int i = 0; i<k; i++){ ///loop through clusters
 			clusters[i].prototype=new float[this.dim];
-			for(int p=0; p<70; p++){ ///loop through prototype
+			for(int p=0; p<200; p++){ ///loop through prototype
 				total = 0;
 				for(int n: clusters[i].currentMembers){///loop through members of cluster
 					total+=trainData.get(n)[p]; ///add up feature data of all members
@@ -65,6 +65,41 @@ public class KMeans extends ClusteringAlgorithm
 			}
 		}
 	}
+	
+	public void distributeMembers() {
+		
+		///copy current members to previous members
+		for(int i=0; i<k; i++){ 
+			clusters[i].previousMembers.clear(); ///clear previousMembers
+			Iterator iter = clusters[i].currentMembers.iterator();
+			while(iter.hasNext()){ ///add currentMembers to previousMembers
+				clusters[i].previousMembers.add((Integer)iter.next());
+			}
+			clusters[i].currentMembers.clear(); ///clear currentMembers
+		}
+		int min; ///cluster with minimum ED
+		double minED; ///minimum ED
+		double sum;
+		///calculate ED
+
+		for(int j=0; j<70; j++){ ///loop through members
+		
+			min=0;
+			minED=999999;
+			for(int i=0; i<k; i++){ ///check ED for every cluster
+				sum=0;
+				for(int k=0; k<200; k++){///calculate ED
+					sum+= Math.pow((trainData.get(j)[k]-clusters[i].prototype[k]),2);
+				}
+				if(Math.sqrt(sum)<=minED){ ///find the minimum ED
+					minED=Math.sqrt(sum);
+					min=i;
+				}
+			}
+		clusters[min].currentMembers.add(j); ///add this member to best cluster
+		}
+	}
+
 
 
 	public boolean train()
@@ -74,6 +109,14 @@ public class KMeans extends ClusteringAlgorithm
 			clusters[(int)random].currentMembers.add(i);
 		}
 		calculatePrototypes();
+		showMembers();
+		
+		for(int i=0; i<20; i++){//TODO: instead of doing this n times, do until 
+								//		clusters are stable
+			distributeMembers();
+			calculatePrototypes();
+			showMembers();
+		}
 		
 		
 	 	//implement k-means algorithm here:
@@ -83,7 +126,7 @@ public class KMeans extends ClusteringAlgorithm
 		// Step 4: repeat until clustermembership stabilizes
 		return false;
 	}
-
+	
 	public boolean test()
 	{
 		// iterate along all clients. Assumption: the same clients are in the same order as in the testData
@@ -111,6 +154,11 @@ public class KMeans extends ClusteringAlgorithm
 	{
 		for (int i = 0; i < k; i++)
 			System.out.println("\nMembers cluster["+i+"] :" + clusters[i].currentMembers);
+	}
+	public void showPreviousMembers()
+	{
+		for (int i = 0; i < k; i++)
+			System.out.println("\nPrevious Members cluster["+i+"] :" + clusters[i].previousMembers);
 	}
 	
 	public void showPrototypes()
