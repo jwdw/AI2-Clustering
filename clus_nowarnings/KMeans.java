@@ -111,24 +111,27 @@ public class KMeans extends ClusteringAlgorithm
 		calculatePrototypes();
 		showMembers();
 		
-		for(int i=0; i<20; i++){//TODO: instead of doing this n times, do until 
-								//		clusters are stable
+		while(!stabilised()){
 			distributeMembers();
 			calculatePrototypes();
 			showMembers();
 		}
-		
-		
-	 	//implement k-means algorithm here:
-		// Step 1: Select an initial random partioning with k clusters
-		// Step 2: Generate a new partition by assigning each datapoint to its closest cluster center
-		// Step 3: recalculate cluster centers
-		// Step 4: repeat until clustermembership stabilizes
 		return false;
 	}
 	
+	private boolean stabilised() {
+		for(int i=0; i<k; i++){ ///check for every cluster if current equals previous
+			if(!clusters[i].currentMembers.equals(clusters[i].previousMembers)){
+				return false;
+			}
+		}
+		return true;
+	}
 	public boolean test()
 	{
+		for(int i=0; i<70; i++){
+			
+		}
 		// iterate along all clients. Assumption: the same clients are in the same order as in the testData
 		// for each client find the cluster of which it is a member
 		// get the actual testData (the vector) of this client
