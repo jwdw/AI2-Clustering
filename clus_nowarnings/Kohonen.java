@@ -65,6 +65,11 @@ public class Kohonen extends ClusteringAlgorithm
 	
 	public boolean train()
 	{
+		for(int i=0; i<70; i++){ ///partition the data randomly
+			double random = Math.random()*n;
+			double random2 = Math.random()*n;
+			clusters[(int)random][(int)random2].currentMembers.add(i);
+		}
 		// Step 1: initialize map with random vectors (A good place to do this, is in the initialisation of the clusters)
 		// Repeat 'epochs' times:
 			// Step 2: Calculate the squareSize and the learningRate, these decrease lineary with the number of epochs.
