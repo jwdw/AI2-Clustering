@@ -5,6 +5,8 @@ public class KMeans extends ClusteringAlgorithm
 	// Number of clusters
 	private int k;
 
+	public int radius;
+	
 	// Dimensionality of the vectors
 	private int dim;
 	
@@ -46,6 +48,7 @@ public class KMeans extends ClusteringAlgorithm
 		this.testData = testData; 
 		this.dim = dim;
 		prefetchThreshold = 0.5;
+		radius=k/2;
 		
 		// Here k new cluster are initialized
 		clusters = new Cluster[k];
@@ -110,6 +113,7 @@ public class KMeans extends ClusteringAlgorithm
 		}
 		calculatePrototypes();
 		showMembers();
+	
 		
 		while(!stabilised()){
 			distributeMembers();
@@ -119,6 +123,7 @@ public class KMeans extends ClusteringAlgorithm
 		return false;
 	}
 	
+
 	private boolean stabilised() {
 		for(int i=0; i<k; i++){ ///check for every cluster if current equals previous
 			if(!clusters[i].currentMembers.equals(clusters[i].previousMembers)){
@@ -127,11 +132,38 @@ public class KMeans extends ClusteringAlgorithm
 		}
 		return true;
 	}
-	public boolean test()
-	{
-		for(int i=0; i<70; i++){
+	public boolean test(){
+	double truePositive, trueNegative, falsePositive, falseNegative;
+	truePositive=trueNegative=falsePositive=falseNegative=0;
+	
+		for(int i=0; i<k; i++){ ///loop per cluster for easy cluster recall
+			for(int j: clusters[i].currentMembers){ ///loop through members of each cluster
+				for(int n=0; n<200; n++){ ///loop through data
+					if(clusters[i].prototype[n]>prefetchThreshold){///page is prefetched
+						if(testData.get(j)[n]==1){ 	///correctly
+							truePositive++;
+						}else{						///incorrectly
+							falsePositive++;
+						}
+					}else{///page is not prefetched
+						if(testData.get(j)[n]==1){	///incorrectly
+							falseNegative++;
+						}else{						///correctly
+							trueNegative++;
+						}
+					}
+				}
+			}
 			
 		}
+		System.out.println(truePositive);
+		System.out.println(trueNegative);
+		System.out.println(falsePositive);
+		System.out.println(falseNegative);
+		
+		this.hitrate=(truePositive/(truePositive+falseNegative));
+		this.accuracy=((truePositive+trueNegative))/(70*200);
+		
 		// iterate along all clients. Assumption: the same clients are in the same order as in the testData
 		// for each client find the cluster of which it is a member
 		// get the actual testData (the vector) of this client

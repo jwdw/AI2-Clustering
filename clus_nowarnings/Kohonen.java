@@ -2,6 +2,7 @@ import java.util.*;
 
 public class Kohonen extends ClusteringAlgorithm
 {
+	public double radius;
 	// Size of clustersmap
 	private int n;
 
@@ -60,6 +61,62 @@ public class Kohonen extends ClusteringAlgorithm
 				clusters[i][i2].prototype = new float[dim];
 			}
 		}
+		
+		
+		
+	}
+	public void calculatePrototypes(){
+		float total=0;
+		for(int i = 0; i<n; i++){ ///loop through clusters
+			for(int j =0; j<n; j++){
+				clusters[i][j].prototype=new float[this.dim];
+				for(int p=0; p<200; p++){ ///loop through prototype
+					total = 0;
+					for(int n: clusters[i][j].currentMembers){///loop through members of cluster
+						total+=trainData.get(n)[p]; ///add up feature data of all members
+					}
+					clusters[i][j].prototype[p]=total/(float)clusters[i][j].currentMembers.size(); ///average feature data
+				}
+			}
+		}
+	}
+	
+	private void adjustNodes() {
+		
+		for(int i=0; i<n; i++){
+			for(int j=0; j<n; j++){
+				
+			}
+		}
+		
+		
+		radius=radius/1.1;
+	}
+	
+	
+	public void examineMembers(){
+		for(int a=0; a<70; a++){ ///loop through members
+			
+			int minI=0;
+			int minJ=0;
+			double minED=999999;
+			int sum=0;
+			
+			for(int i=0; i<n; i++){ ///check ED for every cluster
+				for(int j=0; j<n; j++){
+					sum=0;
+					for(int k=0; k<200; k++){///calculate ED
+						sum+= Math.pow((trainData.get(a)[k]-clusters[i][j].prototype[k]),2);
+					}
+					if(Math.sqrt(sum)<=minED){ ///find the minimum ED
+						minED=Math.sqrt(sum);
+						minI=i;
+						minJ=j;
+					}
+				}
+			}
+		clusters[minI][minJ].currentMembers.add(a); ///add this member to best cluster
+		}
 	}
 
 	
@@ -70,6 +127,9 @@ public class Kohonen extends ClusteringAlgorithm
 			double random2 = Math.random()*n;
 			clusters[(int)random][(int)random2].currentMembers.add(i);
 		}
+		calculatePrototypes();
+		examineMembers();
+		
 		// Step 1: initialize map with random vectors (A good place to do this, is in the initialisation of the clusters)
 		// Repeat 'epochs' times:
 			// Step 2: Calculate the squareSize and the learningRate, these decrease lineary with the number of epochs.
