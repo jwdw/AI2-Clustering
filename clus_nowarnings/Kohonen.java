@@ -61,9 +61,7 @@ public class Kohonen extends ClusteringAlgorithm
 				clusters[i][i2].prototype = new float[dim];
 			}
 		}
-		
-		
-		
+
 	}
 	public void calculatePrototypes(){
 		float total=0;
@@ -94,7 +92,7 @@ public class Kohonen extends ClusteringAlgorithm
 	}
 	
 	
-	public void examineMembers(){
+	public void examineMembers(double η, double radius){
 		for(int a=0; a<70; a++){ ///loop through members
 			
 			int minI=0;
@@ -115,7 +113,20 @@ public class Kohonen extends ClusteringAlgorithm
 					}
 				}
 			}
-		clusters[minI][minJ].currentMembers.add(a); ///add this member to best cluster
+			///adjust the nodes to be more like the vector
+			for(int x = 0; x<n; x++){
+				for(int y = 0; y<n; y++){
+					if(Math.sqrt(Math.pow((x-minI),2)+Math.pow((y-minJ),2))<radius){
+						for(int b=0; b<200; b++){
+							clusters[x][y].prototype[b]= (float)((1-η)*clusters[x][y].prototype[b]+η*trainData.get(a)[b]);
+							
+						}
+						
+					}
+					
+				}
+			}
+			
 		}
 	}
 
@@ -127,8 +138,19 @@ public class Kohonen extends ClusteringAlgorithm
 			double random2 = Math.random()*n;
 			clusters[(int)random][(int)random2].currentMembers.add(i);
 		}
+		
 		calculatePrototypes();
-		examineMembers();
+		showPrototypes();
+		for(int i=0; i<epochs; i++){
+			double radius = (n/2)*(1-(i/epochs));
+			double η = 0.8*(1-(i/epochs));
+			examineMembers(η, radius);
+		
+			
+		}
+		showPrototypes();
+		
+		//examineMembers();
 		
 		// Step 1: initialize map with random vectors (A good place to do this, is in the initialisation of the clusters)
 		// Repeat 'epochs' times:
