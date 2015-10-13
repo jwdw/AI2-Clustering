@@ -164,6 +164,46 @@ public class Kohonen extends ClusteringAlgorithm
 	
 	public boolean test()
 	{
+		double truePositive = 0, trueNegative = 0, falsePositive = 0, falseNegative = 0;
+		for(float[] currentVector: testData){
+
+			int minI=0;
+			int minJ=0;
+			double minED=999999;
+			int sum=0;
+
+
+			for(int i=0; i<n; i++){ ///check ED for every cluster
+				for(int j=0; j<n; j++){
+					sum=0;
+					for(int k=0; k<200; k++){///calculate ED
+						sum+= Math.pow((currentVector[k]-clusters[i][j].prototype[k]),2);
+					}
+					if(Math.sqrt(sum)<=minED){ ///find the minimum ED
+						minED=Math.sqrt(sum);
+						minI=i;
+						minJ=j;
+					}
+				}
+			}
+
+			for(int i=0; i<200; i++){ ///loop through data
+				if(clusters[minI][minJ].prototype[i]>prefetchThreshold){///page is prefetched
+					if(currentVector[i]==1){ 	///correctly
+						truePositive++;
+					}else{						///incorrectly
+						falsePositive++;
+					}
+				}else{///page is not prefetched
+					if(currentVector[i]==1){	///incorrectly
+						falseNegative++;
+					}else{						///correctly
+						trueNegative++;
+					}
+				}
+			}
+
+		}
 		// iterate along all clients
 		// for each client find the cluster of which it is a member
 		// get the actual testData (the vector) of this client
@@ -172,6 +212,15 @@ public class Kohonen extends ClusteringAlgorithm
 		// count number of hits
 		// count number of requests
 		// set the global variables hitrate and accuracy to their appropriate value
+
+		System.out.println(truePositive);
+		System.out.println(trueNegative);
+		System.out.println(falsePositive);
+		System.out.println(falseNegative);
+
+		this.hitrate=(truePositive/(truePositive+falseNegative));
+		this.accuracy=((truePositive+trueNegative))/(70*200);
+
 		return true;
 	}
 
