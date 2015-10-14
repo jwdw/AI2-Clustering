@@ -219,7 +219,7 @@ public class Kohonen extends ClusteringAlgorithm
 		System.out.println(falseNegative);
 
 		this.hitrate=(truePositive/(truePositive+falseNegative));
-		this.accuracy=((truePositive+trueNegative))/(70*200);
+		this.accuracy=((truePositive))/(truePositive+falsePositive);
 
 		return true;
 	}

@@ -162,7 +162,7 @@ public class KMeans extends ClusteringAlgorithm
 		System.out.println(falseNegative);
 		
 		this.hitrate=(truePositive/(truePositive+falseNegative));
-		this.accuracy=((truePositive+trueNegative))/(70*200);
+		this.accuracy=((truePositive))/(truePositive+falsePositive);
 		
 		// iterate along all clients. Assumption: the same clients are in the same order as in the testData
 		// for each client find the cluster of which it is a member
