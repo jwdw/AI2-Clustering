@@ -77,18 +77,15 @@ public class Kohonen extends ClusteringAlgorithm
 				}
 			}
 		}
-	}
-	
-	private void adjustNodes() {
-		
-		for(int i=0; i<n; i++){
+		for(int i=0; i<n; i++){ ///if a cluster is empty, initialise the prototype with 0.5 everywhere
 			for(int j=0; j<n; j++){
-				
+				if(clusters[i][j].currentMembers.isEmpty()){
+					for(int k=0; k<200; k++){
+						clusters[i][j].prototype[k]=(float)0.5;
+					}
+				}
 			}
 		}
-		
-		
-		radius=radius/1.1;
 	}
 	
 	
